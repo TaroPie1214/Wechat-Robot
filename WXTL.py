@@ -22,7 +22,7 @@ def parser(data):
                 },
             },
             "userInfo": {
-                "apiKey": "0bc0e8729d68490883deb2734b69c23f",
+                "apiKey": "复制你的api到这里",
                 "userId": number_wxid
             }
         }
@@ -95,6 +95,3 @@ def parser(data):
 if __name__ == '__main__':
     spy = WeChatSpy(parser=parser)
     spy.run()
-
-#wxid_1157791577711
-#wxid_1fbf89webaor12
