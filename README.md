@@ -22,5 +22,5 @@ Use your own Wechat account as a chatting robot by PyWeChatSpy and api.
 
 联系QQ:860261812
 
-![image](https://github.com/aty26136/Wechat-Robot/blob/master/image/trytry.jpg)
+![image](https://github.com/aty26136/Wechat-Robot/blob/master/image/trytry.png)
 ![image](https://github.com/aty26136/Wechat-Robot/blob/master/image/captain.gif)
