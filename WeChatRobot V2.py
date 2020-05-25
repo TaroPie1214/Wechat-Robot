@@ -34,7 +34,7 @@ def parser(data):
                     },
                 },
                 "userInfo": {
-                    "apiKey": "复制你的api到这里",
+                    "apiKey": "0bc0e8729d68490883deb2734b69c23f",
                     "userId": number_wxid
                 }
             }
@@ -81,12 +81,7 @@ def parser(data):
         # 变量temp_times以及ar_times都是为了防止再次执行
         # temp_times存在的意义是实现程序开始后第一次执行
         # ar_times存在的意义是当data中的content发生改变时，再调用api
-    else:
-        raise Exception
 
 if __name__ == '__main__':
-    try:
         spy = WeChatSpy(parser=parser)
         spy.run()
-    except Exception as e:
-        print(e)
