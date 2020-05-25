@@ -1,6 +1,9 @@
 from PyWeChatSpy import WeChatSpy
 import json
 import requests
+from weather import *
+import re
+from searchPics import *
 
 try_times = 0
 ar_times = 0
@@ -8,65 +11,76 @@ temp_times = 0
 
 def parser(data):
     def tryTuLin(current_content, number_wxid):
-        urls = 'http://openapi.tuling123.com/openapi/api/v2'  #ÇëÇóµØÖ·
-        data_dic = {
-            "reqType": 0,
-            "perception": {
-                "inputText": {
-                    "text": current_content
+        if re.match('(\w){1,10}å¤©æ°”', current_content):
+            # è°ƒç”¨weatherå‡½æ•°
+            back_content = reply_weather(current_content)
+            print(back_content)
+            spy.send_text(current_wxid, back_content)
+        elif re.match('å›¾ç‰‡ï¼š(\w){1,20}', current_content):
+            spy.send_text(current_wxid, 'å›¾ç‰‡æœç´¢ç»“æœ')
+            downloadPic(current_content, 3)
+            for i in range(1, 4):
+                spy.send_file(current_wxid, 'download/images/%0.3d.jpg' % i)
+        else:
+            urls = 'http://openapi.tuling123.com/openapi/api/v2'  #è¯·æ±‚åœ°å€
+            data_dic = {
+                "reqType": 0,
+                "perception": {
+                     "inputText": {
+                        "text": current_content
+                     },
+                    "inputImage": {
+                        "url": "imageUrl"
+                    },
                 },
-                "inputImage": {
-                    "url": "imageUrl"
-                },
-            },
-            "userInfo": {
-                "apiKey": "¸´ÖÆÄãµÄapiµ½ÕâÀï",
-                "userId": number_wxid
+                "userInfo": {
+                    "apiKey": "å¤åˆ¶ä½ çš„apiåˆ°è¿™é‡Œ",
+                    "userId": number_wxid
+                }
             }
-        }
-        data_json = json.dumps(data_dic).encode('utf8')
-        a = requests.post(urls, data_json)  # Ê¹ÓÃpostÇëÇó
-        content = (a._content).decode('utf-8')  # »ñÈ¡·µ»Ø½á¹û_contentÊôĞÔ£¬½âÂë
-        res = json.loads(content)['results'] # ·´ĞòÁĞ»¯
-        for i in res:
-            back_content = i['values']['text']
-        print(back_content)
-        spy.send_text(current_wxid, back_content)
-        return back_content
+            data_json = json.dumps(data_dic).encode('utf8')
+            a = requests.post(urls, data_json)  # ä½¿ç”¨postè¯·æ±‚
+            content = (a._content).decode('utf-8')  # è·å–è¿”å›ç»“æœ_contentå±æ€§ï¼Œè§£ç 
+            res = json.loads(content)['results'] # ååºåˆ—åŒ–
+            for i in res:
+                back_content = i['values']['text']
+             print(back_content)
+            spy.send_text(current_wxid, back_content)
+            return back_content
 
-    #ÓÉÓÚuseridÒªÇó±ØĞëÊÇÊÇintÀàĞÍ£¬¶øwxid±¾ÉíÊÇÒ»¸ö×Ö·û´®ÀàĞÍ£¬ÕâÀïÍ¨¹ı½«×Ö·û´®ÖĞµÄÃ¿¸ö×Ö·û
-    # ×ª»»³ÉascÂëÔÙÀÛ¼Ó£¬ÊµÏÖÁËÔÚÂú×ãintÀàĞÍµÄÍ¬Ê±£¬×ª»¯ºóµÄidÒ²¿ÉÒÔÒ»Ò»¶ÔÓ¦
+    #ç”±äºuseridè¦æ±‚å¿…é¡»æ˜¯æ˜¯intç±»å‹ï¼Œè€Œwxidæœ¬èº«æ˜¯ä¸€ä¸ªå­—ç¬¦ä¸²ç±»å‹ï¼Œè¿™é‡Œé€šè¿‡å°†å­—ç¬¦ä¸²ä¸­çš„æ¯ä¸ªå­—ç¬¦
+    # è½¬æ¢æˆascç å†ç´¯åŠ ï¼Œå®ç°äº†åœ¨æ»¡è¶³intç±»å‹çš„åŒæ—¶ï¼Œè½¬åŒ–åçš„idä¹Ÿå¯ä»¥ä¸€ä¸€å¯¹åº”
     def wxidtonumber(current_wxid):
         number_wxid = 0
         for i in current_wxid:
-            number_wxid += ord(i) #·µ»Ø×Ö·û¶ÔÓ¦µÄASCII
+            number_wxid += ord(i) #è¿”å›å­—ç¬¦å¯¹åº”çš„ASCII
         return number_wxid
 
     print(data)
 
-    if 'data' in data:  # ÒòÎªÈç¹ûÃ»ÊÕµ½ÄÚÈİÔò²»»á´«»Ødata£¬ËùÒÔµ±ÊÕµ½ÄÚÈİÊ±ÔÙÖ´ĞĞÏÂÁĞÓï¾ä
+    if 'data' in data:  # å› ä¸ºå¦‚æœæ²¡æ”¶åˆ°å†…å®¹åˆ™ä¸ä¼šä¼ å›dataï¼Œæ‰€ä»¥å½“æ”¶åˆ°å†…å®¹æ—¶å†æ‰§è¡Œä¸‹åˆ—è¯­å¥
         for item in data['data']:
-            current_self = item['self']  # selfÎª0ÔòÎªÊÕµ½ÄÚÈİ£¬Îª1ÔòÎª·¢³öÄÚÈİ
-            current_wxid = item['wxid1']  # ¶Ô·½µÄwxid
-            current_content = item['content']  # ÊÕµ½µÄÄÚÈİ
+            current_self = item['self']  # selfä¸º0åˆ™ä¸ºæ”¶åˆ°å†…å®¹ï¼Œä¸º1åˆ™ä¸ºå‘å‡ºå†…å®¹
+            current_wxid = item['wxid1']  # å¯¹æ–¹çš„wxid
+            current_content = item['content']  # æ”¶åˆ°çš„å†…å®¹
 
         global temp_content, temp_times, ar_times
-        if temp_times == 0:  # temp_timesÄ¬ÈÏÖµÎª0
-            temp_content = current_content  # ¸³Öµ
-            temp_times += 1  # ·ÀÖ¹ÔÙ´ÎÖ´ĞĞ
-        if temp_content != current_content:  # dataÖĞµÄcontentË¢ĞÂ£¬ÒâÎ¶×ÅÊÕµ½ÁËĞÂµÄÄÚÈİ
-            ar_times = 0  # ¸³ÖµÎª0
-            temp_content = current_content  # ¸³Öµ
+        if temp_times == 0:  # temp_timesé»˜è®¤å€¼ä¸º0
+            temp_content = current_content  # èµ‹å€¼
+            temp_times += 1  # é˜²æ­¢å†æ¬¡æ‰§è¡Œ
+        if temp_content != current_content:  # dataä¸­çš„contentåˆ·æ–°ï¼Œæ„å‘³ç€æ”¶åˆ°äº†æ–°çš„å†…å®¹
+            ar_times = 0  # èµ‹å€¼ä¸º0
+            temp_content = current_content  # èµ‹å€¼
         if current_self == 0:
-            if ar_times == 0:  # ÖµÎª0Ê±²Å¼ÌĞøÖ´ĞĞ
-                content1 = 'ÒÑÊÕµ½!'
-                number_wxid = wxidtonumber(current_wxid)  # wxid´Ó×Ö·û´®Í¨¹ı±àÂë×ª»»Îª´¿Êı×Ö
-                tryTuLin(current_content, number_wxid)  # µ÷ÓÃÍ¼Áé»úÆ÷ÈËapi×Ô¶¯»Ø¸´
-                print('auto send success')  # ¿ØÖÆÌ¨´òÓ¡×Ô¶¯»Ø¸´³É¹¦
-                ar_times += 1  # ·ÀÖ¹ÔÙ´ÎÖ´ĞĞ
-        # ±äÁ¿temp_timesÒÔ¼°ar_times¶¼ÊÇÎªÁË·ÀÖ¹ÔÙ´ÎÖ´ĞĞ
-        # temp_times´æÔÚµÄÒâÒåÊÇÊµÏÖ³ÌĞò¿ªÊ¼ºóµÚÒ»´ÎÖ´ĞĞ
-        # ar_times´æÔÚµÄÒâÒåÊÇµ±dataÖĞµÄcontent·¢Éú¸Ä±äÊ±£¬ÔÙµ÷ÓÃapi
+            if ar_times == 0:  # å€¼ä¸º0æ—¶æ‰ç»§ç»­æ‰§è¡Œ
+                content1 = 'å·²æ”¶åˆ°!'
+                number_wxid = wxidtonumber(current_wxid)  # wxidä»å­—ç¬¦ä¸²é€šè¿‡ç¼–ç è½¬æ¢ä¸ºçº¯æ•°å­—
+                tryTuLin(current_content, number_wxid)  # è°ƒç”¨å›¾çµæœºå™¨äººapiè‡ªåŠ¨å›å¤
+                print('auto send success')  # æ§åˆ¶å°æ‰“å°è‡ªåŠ¨å›å¤æˆåŠŸ
+                ar_times += 1  # é˜²æ­¢å†æ¬¡æ‰§è¡Œ
+        # å˜é‡temp_timesä»¥åŠar_timeséƒ½æ˜¯ä¸ºäº†é˜²æ­¢å†æ¬¡æ‰§è¡Œ
+        # temp_timeså­˜åœ¨çš„æ„ä¹‰æ˜¯å®ç°ç¨‹åºå¼€å§‹åç¬¬ä¸€æ¬¡æ‰§è¡Œ
+        # ar_timeså­˜åœ¨çš„æ„ä¹‰æ˜¯å½“dataä¸­çš„contentå‘ç”Ÿæ”¹å˜æ—¶ï¼Œå†è°ƒç”¨api
     else:
         raise Exception
 
