@@ -24,3 +24,8 @@ Use your own Wechat account as a chatting robot by PyWeChatSpy and api.
 
 ![image](https://github.com/aty26136/Wechat-Robot/blob/master/image/trytry.png)
 ![image](https://github.com/aty26136/Wechat-Robot/blob/master/image/captain.gif)
+
+
+### 关于新加的两个功能
+1. 天气自动回复 weather.py
+2. 图片关键字批量搜索 searchPics.py
