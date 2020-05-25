@@ -1,6 +1,6 @@
 Use your own Wechat account as a chatting robot by PyWeChatSpy and api.
 
-微信机器人：
+## 微信机器人
 
 使用你的一个微信账户通过windows上的客户端来实现接受信息和回复信息
 
