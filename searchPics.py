@@ -33,4 +33,4 @@ def downloadPic(keyword, number):
         fp = open('download/images/%0.3d.jpg' % i, 'wb')
         fp.write(pic.content) #文件流写入图片
         fp.close()
-        i += 1 #迭代
+        i += 1 #迭代i
