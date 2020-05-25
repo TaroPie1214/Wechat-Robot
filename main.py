@@ -2,45 +2,50 @@ from PyWeChatSpy import WeChatSpy
 import requests
 from weather import *
 import re
+from searchPics import *
 
-#wxrobot¿ò¼Ü
+#wxrobotæ¡†æ¶
 
 def get_reply(data):
-    # key»ñÈ¡µØÖ·http://xiao.douqq.com/
+    # keyè·å–åœ°å€http://xiao.douqq.com/
     url = f"http://api.douqq.com/?key=dUk1cEtUdmZxc2RCPW5XaFdBdT1lWUJiSnhzQUFBPT0&msg={data}"
     resp = requests.get(url)
     return resp.text
 
-#ÁÙÊ±½Ó¿Ú£¨´ıĞŞ¸Ä£©
+#ä¸´æ—¶æ¥å£ï¼ˆå¾…ä¿®æ”¹ï¼‰
+##éœ€è¦ä¸Anthonyçš„ä»£ç æ¥æ´½
 
 def parser(data):
     if data["type"] == 1:
         print(data)
     elif data["type"] == 200:
-        # ĞÄÌø
+        # å¿ƒè·³
         pass
     elif data["type"] == 203:
-        print("Î¢ĞÅÍË³öµÇÂ¼")
+        print("å¾®ä¿¡é€€å‡ºç™»å½•")
     elif data["type"] == 5:
-        # ÏûÏ¢
+        # æ¶ˆæ¯
         for item in data["data"]:
             content = item["content"]
             print(content)
-            #Èç¹ûÊÕµ½ÄÚÈİ¸ñÊ½ÎªxxÌìÆø£¬ÕıÔòÆ¥Åä
-            if re.match('(\w){1,10}ÌìÆø', content):
-                #µ÷ÓÃweatherº¯Êı
+            #å¦‚æœæ”¶åˆ°å†…å®¹æ ¼å¼ä¸ºxxå¤©æ°”ï¼Œæ­£åˆ™åŒ¹é…
+            if re.match('(\w){1,10}å¤©æ°”', content):
+                #è°ƒç”¨weatherå‡½æ•°
                 reply = reply_weather(content)
                 print(reply)
+            #å¦‚æœæ”¶åˆ°å›¾ç‰‡æœç´¢æŒ‡ä»¤
+            elif re.match('å›¾ç‰‡ï¼š(\w){1,20}', content):
+                reply = 'å›¾ç‰‡æœç´¢ç»“æœï¼š'
+                downloadPic(content, 3)  #ä¸‹è½½ 
+                for i in range(1, 4): #å›ä¼ ç»™å®¢æˆ·ç«¯
+                    spy.send_file("æŒ‡å®šçš„wxid", 'download/images/%0.3d.jpg' % i)
             else:
                 reply = get_reply(content)
                 print(reply)
-            spy.send_text("wxid_3xollkhxgq5t22", reply)
+            spy.send_text("æŒ‡å®šçš„wxid", reply)
     elif data["type"] == 2:
         print(data)
 
 if __name__ == '__main__':
     spy = WeChatSpy(parser=parser)
     spy.run()
-
-
-
