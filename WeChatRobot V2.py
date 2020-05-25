@@ -44,7 +44,7 @@ def parser(data):
             res = json.loads(content)['results'] # 反序列化
             for i in res:
                 back_content = i['values']['text']
-             print(back_content)
+            print(back_content)
             spy.send_text(current_wxid, back_content)
             return back_content
 
